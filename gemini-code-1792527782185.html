@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tele Doctor Console - Dr. Madhusudan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- jsPDF Library for instant client-side PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-slate-100 min-h-screen p-3 text-slate-800">
+  <div class="max-w-2xl mx-auto bg-white p-5 rounded-xl shadow-lg space-y-4">
+    
+    <div class="border-b pb-2 text-center">
+      <h1 class="text-xl font-bold text-teal-800">Tele Doctor Console (GitHub Hosted)</h1>
+      <p class="text-xs text-slate-500">Dr. Madhusudan MBBS | Reg: APMC/FMR/111849 | Phone: +91 9381353748</p>
+    </div>
+
+    <!-- Quick Presets -->
+    <div class="bg-teal-50 p-3 rounded-lg border border-teal-200 space-y-1">
+      <label class="block text-xs font-bold text-teal-900">⚡ 1-Tap Complete Presets (Fills Everything Instantly):</label>
+      <div class="flex gap-2 flex-wrap text-xs pt-1">
+        <button onclick="applyPreset('anitha')" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-3 py-1.5 rounded shadow">Mrs. Anitha (Fever & HTN)</button>
+        <button onclick="applyPreset('fever')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded shadow">Viral Fever & Cold</button>
+        <button onclick="applyPreset('sugar')" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded shadow">Diabetes Follow-up</button>
+      </div>
+    </div>
+
+    <!-- Patient Information -->
+    <div class="bg-slate-50 p-3 rounded-lg border space-y-2">
+      <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wide">Patient Information</h3>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs font-semibold">Patient Name *</label>
+          <input type="text" id="patientName" placeholder="e.g. B. Anitha" class="w-full border p-2 rounded text-sm bg-white">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold">Phone Number *</label>
+          <input type="text" id="patientPhone" placeholder="e.g. 9494235764" class="w-full border p-2 rounded text-sm bg-white">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold">Age (Years)</label>
+          <input type="number" id="age" placeholder="49" class="w-full border p-2 rounded text-sm bg-white">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold">Gender</label>
+          <select id="gender" class="w-full border p-2 rounded text-sm bg-white">
+            <option value="Female">Female</option>
+            <option value="Male">Male</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-semibold">Location / City</label>
+          <input type="text" id="location" placeholder="Attapur, Hyderabad, Telangana" class="w-full border p-2 rounded text-sm bg-white">
+        </div>
+      </div>
+    </div>
+
+    <!-- Vitals -->
+    <div class="bg-slate-50 p-3 rounded-lg border space-y-2">
+      <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wide">Vitals (Confirmed by Patient)</h3>
+      <input type="text" id="vitalsText" value="Vitals confirmed by patient during call (BP: 140/100 mmHg, Pulse: 100 bpm, SpO2: 98%, Temp: 99°F)" class="w-full border p-2 rounded text-xs bg-white">
+    </div>
+
+    <!-- Diagnosis & Clinical Notes -->
+    <div class="bg-slate-50 p-3 rounded-lg border space-y-2">
+      <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wide">Diagnosis & Clinical Notes</h3>
+      <div>
+        <label class="block text-xs font-semibold">Symptoms & Onset</label>
+        <input type="text" id="symptoms" placeholder="Fever, Cough, Cold since 4 days" class="w-full border p-2 rounded text-sm bg-white">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold">Provisional Diagnosis *</label>
+        <input type="text" id="diagnosis" placeholder="Fever for Evaluation, Uncontrolled Hypertension" class="w-full border p-2 rounded text-sm bg-white">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold">Medical History & Direction</label>
+        <input type="text" id="medHistory" placeholder="Known HTN on Tab Telmikind-H. Stop Telmikind-H immediately." class="w-full border p-2 rounded text-sm bg-white">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold">Investigations Advised</label>
+        <textarea id="investigations" rows="2" placeholder="1. Hemogram with MP&#10;2. NS1 Antigen" class="w-full border p-2 rounded text-sm bg-white"></textarea>
+      </div>
+    </div>
+
+    <!-- Medications Table -->
+    <div class="bg-slate-50 p-3 rounded-lg border space-y-2">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wide">Rx - Medications Prescribed</h3>
+        <select onchange="addQuickMed(this.value)" class="border p-1 rounded text-xs bg-teal-50 text-teal-900 font-bold">
+          <option value="">+ Quick Add Medicine</option>
+          <option value="Cilaheart|10 mg|Oral|Morning|10 days|After Breakfast">Tab. Cilaheart 10mg</option>
+          <option value="Calpol|500 mg|Oral|Morning and Night|5 days|After Food">Tab. Calpol 500mg</option>
+          <option value="Dolo|650 mg|Oral|SOS for fever|3 days|After Food">Tab. Dolo 650mg</option>
+          <option value="Levocet|5 mg|Oral|Morning and Night|5 days|After Food">Tab. Levocet 5mg</option>
+          <option value="Amoxyclav|625 mg|Oral|Morning and Night|5 days|After Food">Tab. Amoxyclav 625mg</option>
+        </select>
+      </div>
+      <div id="medList" class="space-y-2"></div>
+      <button onclick="addMedRow()" class="text-xs bg-slate-200 hover:bg-slate-300 font-semibold px-3 py-1 rounded">+ Add Custom Row</button>
+    </div>
+
+    <!-- Advice & Follow-Up -->
+    <div class="bg-slate-50 p-3 rounded-lg border space-y-2">
+      <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wide">Dietary Advice & Follow-Up</h3>
+      <div>
+        <label class="block text-xs font-semibold">Dietary & Lifestyle Advice</label>
+        <textarea id="advice" rows="2" placeholder="Strictly reduce salt intake, avoid oily food." class="w-full border p-2 rounded text-sm bg-white"></textarea>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold">Follow-Up Schedule</label>
+        <input type="text" id="reviewDate" placeholder="Follow up as soon as blood investigation reports are ready." class="w-full border p-2 rounded text-sm bg-white">
+      </div>
+    </div>
+
+    <!-- Download Button -->
+    <div class="pt-2">
+      <button onclick="generatePDF()" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-3 px-4 rounded-lg text-sm shadow">
+        📥 Download Prescription PDF Instantly
+      </button>
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      applyPreset('anitha'); // Load Mrs Anitha by default
+    };
+
+    function addMedRow(drug='', strength='', route='Oral', freq='Morning and Night', dur='5 days', inst='After Food') {
+      const div = document.createElement('div');
+      div.className = "grid grid-cols-6 gap-1 med-row text-xs";
+      div.innerHTML = `
+        <input type="text" placeholder="Drug Name" value="${drug}" class="med-drug col-span-2 border p-1 rounded bg-white">
+        <input type="text" placeholder="Strength" value="${strength}" class="med-strength border p-1 rounded bg-white">
+        <input type="text" placeholder="Freq" value="${freq}" class="med-freq border p-1 rounded bg-white">
+        <input type="text" placeholder="Duration" value="${dur}" class="med-dur border p-1 rounded bg-white">
+        <input type="text" placeholder="Instructions" value="${inst}" class="med-inst border p-1 rounded bg-white">
+      `;
+      document.getElementById('medList').appendChild(div);
+    }
+
+    function addQuickMed(str) {
+      if (!str) return;
+      const parts = str.split('|');
+      addMedRow('Tab. ' + parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]);
+    }
+
+    function applyPreset(type) {
+      if (type === 'anitha') {
+        document.getElementById('patientName').value = "B. Anitha";
+        document.getElementById('patientPhone').value = "9494235764";
+        document.getElementById('age').value = "49";
+        document.getElementById('gender').value = "Female";
+        document.getElementById('location').value = "Attapur, Hyderabad, Telangana";
+        document.getElementById('vitalsText').value = "Vitals confirmed by patient during call (BP: 140/100 mmHg, Pulse: 100 bpm, SpO2: 98%, Temp: 99°F)";
+        document.getElementById('symptoms').value = "Fever, Cough, Cold since 4 days";
+        document.getElementById('medHistory').value = "Known case of Hypertension on Tab Telmikind-H. Stop Tab. Telmikind-H and start revised prescription.";
+        document.getElementById('diagnosis').value = "Fever for Evaluation, Uncontrolled Hypertension";
+        document.getElementById('investigations').value = "1. Hemogram with Peripheral Smear for Malarial Parasite\n2. NS1 Antigen test Advised\n3. Lipid Profile Advised\n4. Thyroid Profile Advised\n5. ECG, 2D Echo Advised";
+        document.getElementById('advice').value = "Strictly reduce salt intake; avoid oily, greasy, and fried foods.\nBrisk walking for 45 minutes daily.";
+        document.getElementById('reviewDate').value = "Follow up as soon as blood investigation reports are ready.";
+
+        document.getElementById('medList').innerHTML = "";
+        addMedRow("Tab. Cilaheart", "10 mg", "Oral", "Morning", "10 days", "After Breakfast");
+        addMedRow("Tab. Calpol", "500 mg", "Oral", "Morning and Night", "5 days", "After Food");
+        addMedRow("Tab. Levocet", "5 mg", "Oral", "Morning and Night", "5 days", "After Food");
+        addMedRow("Tab. Amoxyclav", "625 mg", "Oral", "Morning and Night", "5 days", "After Food");
+      } else if (type === 'fever') {
+        document.getElementById('patientName').value = "Rahul Sharma";
+        document.getElementById('patientPhone').value = "9876543210";
+        document.getElementById('age').value = "35";
+        document.getElementById('gender').value = "Male";
+        document.getElementById('location').value = "Gachibowli, Hyderabad";
+        document.getElementById('vitalsText').value = "Vitals confirmed by patient (BP: 120/80 mmHg, Pulse: 80 bpm, Temp: 101°F)";
+        document.getElementById('symptoms').value = "High fever and body aches since 2 days";
+        document.getElementById('medHistory').value = "No known chronic illnesses";
+        document.getElementById('diagnosis').value = "Acute Viral Fever";
+        document.getElementById('investigations').value = "1. CBC\n2. Dengue NS1 Antigen";
+        document.getElementById('advice').value = "Adequate rest and warm fluid intake.";
+        document.getElementById('reviewDate').value = "Review after 3 days.";
+
+        document.getElementById('medList').innerHTML = "";
+        addMedRow("Tab. Dolo", "650 mg", "Oral", "SOS for Fever", "3 days", "After Food");
+        addMedRow("Tab. Levocet", "5 mg", "Oral", "Night", "3 days", "After Food");
+      } else if (type === 'sugar') {
+        document.getElementById('patientName').value = "K. Venkat Rao";
+        document.getElementById('patientPhone').value = "9123456789";
+        document.getElementById('age').value = "58";
+        document.getElementById('gender').value = "Male";
+        document.getElementById('location').value = "Secunderabad, Telangana";
+        document.getElementById('vitalsText').value = "Vitals confirmed (BP: 130/85 mmHg, Pulse: 76 bpm)";
+        document.getElementById('symptoms').value = "Routine diabetes follow-up";
+        document.getElementById('medHistory').value = "Type 2 Diabetes Mellitus for 5 years";
+        document.getElementById('diagnosis').value = "Type 2 Diabetes Mellitus - Controlled";
+        document.getElementById('investigations').value = "1. FBS & PPBS\n2. HbA1c";
+        document.getElementById('advice').value = "Strict diet control, avoid sweets, walk 30 mins daily.";
+        document.getElementById('reviewDate').value = "Review in 1 month with reports.";
+
+        document.getElementById('medList').innerHTML = "";
+        addMedRow("Tab. Metformin", "500 mg", "Oral", "Morning and Night", "30 days", "After Food");
+        addMedRow("Tab. Teneligliptin", "20 mg", "Oral", "Morning", "30 days", "Before Breakfast");
+      }
+    }
+
+    function generatePDF() {
+      const name = document.getElementById('patientName').value.trim();
+      const phone = document.getElementById('patientPhone').value.trim();
+      const diagnosis = document.getElementById('diagnosis').value.trim();
+
+      if (!name || !phone) {
+        alert("Please enter Patient Name and Phone Number.");
+        return;
+      }
+      if (!diagnosis) {
+        alert("Please enter a Provisional Diagnosis.");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      let y = 15;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("TELECONSULTATION RECORD", 105, y, { align: "center" });
+      
+      y += 8;
+      doc.setFontSize(16);
+      doc.setTextColor(13, 148, 136);
+      doc.text("Dr. Madhusudan MBBS", 105, y, { align: "center" });
+      
+      y += 6;
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont("helvetica", "normal");
+      doc.text("General Physician | Reg. No: APMC/FMR/111849 | Phone: +91 9381353748", 105, y, { align: "center" });
+      
+      y += 6;
+      const todayStr = new Date().toISOString().split('T')[0];
+      doc.text(`Date: ${todayStr} | Patient: ${name} (${document.getElementById('age').value || 'N/A'} Yrs / ${document.getElementById('gender').value})`, 14, y);
+      
+      y += 4;
+      doc.setLineWidth(0.5);
+      doc.line(14, y, 196, y);
+      
+      y += 6;
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(0, 0, 0);
+      doc.text("VITALS & ALLERGIES:", 14, y);
+      y += 5;
+      doc.setFont("helvetica", "normal");
+      doc.text(document.getElementById('vitalsText').value, 14, y);
+      
+      y += 7;
+      doc.setFont("helvetica", "bold");
+      doc.text("PROVISIONAL DIAGNOSIS:", 14, y);
+      y += 5;
+      doc.setFont("helvetica", "normal");
+      doc.text(diagnosis, 14, y);
+      
+      const medHistory = document.getElementById('medHistory').value;
+      if (medHistory) {
+        y += 7;
+        doc.setFont("helvetica", "bold");
+        doc.text("MEDICAL HISTORY & NOTES:", 14, y);
+        y += 5;
+        doc.setFont("helvetica", "normal");
+        doc.text(medHistory, 14, y);
+      }
+
+      const investigations = document.getElementById('investigations').value;
+      if (investigations) {
+        y += 7;
+        doc.setFont("helvetica", "bold");
+        doc.text("INVESTIGATIONS ADVISED:", 14, y);
+        y += 5;
+        doc.setFont("helvetica", "normal");
+        doc.text(investigations, 14, y);
+      }
+
+      y += 7;
+      doc.setFont("helvetica", "bold");
+      doc.text("Rx - MEDICATIONS PRESCRIBED:", 14, y);
+      y += 5;
+
+      const medRows = document.querySelectorAll('.med-row');
+      medRows.forEach((row, idx) => {
+        const drug = row.querySelector('.med-drug').value;
+        const strength = row.querySelector('.med-strength').value;
+        const freq = row.querySelector('.med-freq').value;
+        const dur = row.querySelector('.med-dur').value;
+        const inst = row.querySelector('.med-inst>().value' || '');
+        if (drug) {
+          doc.setFont("helvetica", "bold");
+          doc.text(`${idx + 1}. ${drug} (${strength})`, 18, y);
+          y += 4;
+          doc.setFont("helvetica", "normal");
+          doc.text(`   Freq: ${freq} | Duration: ${dur} | ${row.querySelector('.med-inst').value}`, 18, y);
+          y += 6;
+        }
+      });
+
+      y += 4;
+      doc.setFont("helvetica", "bold");
+      doc.text("DIETARY & LIFESTYLE ADVICE:", 14, y);
+      y += 5;
+      doc.setFont("helvetica", "normal");
+      doc.text(document.getElementById('advice').value, 14, y);
+
+      y += 7;
+      doc.setFont("helvetica", "bold");
+      doc.text("FOLLOW-UP:", 14, y);
+      y += 5;
+      doc.setFont("helvetica", "normal");
+      doc.text(document.getElementById('reviewDate').value, 14, y);
+
+      doc.save(`Rx_${name}_${todayStr}.pdf`);
+      alert("Success! Prescription PDF downloaded to your device.");
+    }
+  </script>
+</body>
+</html>
